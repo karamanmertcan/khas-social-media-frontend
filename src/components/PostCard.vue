@@ -2,13 +2,17 @@
 import MdHeartEmptyIcon from 'vue-ionicons/dist/md-heart-empty.vue';
 import MdChatboxesIcon from 'vue-ionicons/dist/md-chatboxes.vue';
 import MdBookmarkIcon from 'vue-ionicons/dist/md-bookmark.vue';
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 import { useStore } from 'vuex';
 // eslint-disable-next-line object-curly-newline
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
+import { useMutation } from 'vue-query';
 import PostOrCommentOwner from './PostOrCommentOwner.vue';
+import * as Queries from '../utils/queries';
 
 const store = useStore();
+
+const comment = ref('');
 
 const props = defineProps({
   post: {
@@ -18,11 +22,46 @@ const props = defineProps({
   deletePost: {
     type: Object,
   },
+  handleLike: {
+    type: Object,
+  },
+  handleUnlike: {
+    type: Object,
+  },
 });
+
+const addCommentMutation = useMutation(Queries.addComment, {
+  onSuccess: (res) => {
+    // eslint-disable-next-line no-underscore-dangle
+    if (props.post._id === res._id) {
+      // eslint-disable-next-line vue/no-mutating-props
+      // eslint-disable-next-line no-unused-expressions
+      // eslint-disable-next-line vue/no-mutating-props
+      props.post.comments.push(res.comments[0]);
+
+      comment.value = '';
+    }
+  },
+});
+
+const handleLikeAndUnlike = () => {
+  if (props.post.likes.includes(store.state.user._id)) {
+    props.handleUnlike.mutate(props.post._id);
+  } else {
+    props.handleLike.mutate(props.post._id);
+  }
+};
 
 const deletePostPress = () => {
   // eslint-disable-next-line no-underscore-dangle
   props.deletePost.mutate(props.post._id);
+};
+
+const addCommentPress = () => {
+  addCommentMutation.mutate({
+    postId: props.post._id,
+    comment: comment.value,
+  });
 };
 </script>
 
@@ -60,7 +99,7 @@ const deletePostPress = () => {
     </div>
     <div class="flex mt-5">
       <div class="cursor-pointer">
-        <MdHeartEmptyIcon w="30px" h="30px" />
+        <MdHeartEmptyIcon w="30px" h="30px" @click="handleLikeAndUnlike" :class="{ 'fill-red-500': props.post.likes.includes(store.state.user._id) }" />
       </div>
       <div class="cursor-pointer pl-5">
         <MdChatboxesIcon w="30px" h="30px" />
@@ -71,15 +110,15 @@ const deletePostPress = () => {
     </div>
     <div id="comment" class="p-5 w-full">
       <!--eslint-disable vuejs-accessibility/form-control-has-label */ /* eslint-disable vuejs-accessibility/label-has-for */-->
-      <textarea type="textarea" rows="5" cols="10" wrap="soft" name="comment" class="w-full rounded-lg h-24" placeholder="Write Your Comment" />
+      <!-- eslint-disable-next-line vue/no-mutating-props-->
+      <textarea v-model="comment" type="textarea" rows="5" cols="10" wrap="soft" name="comment" class="w-full rounded-lg h-24" placeholder="Write Your Comment" />
+      <button @click="addCommentPress" class="w-full cursor-pointer bg-blue-500 hover:bg-blue-700 text-white h-10 rounded-2xl flex items-center justify-center" data-modal-toggle="defaultModal">Make Comment</button>
     </div>
     <div>
       <h2 class="font-bold text-xl pb-3">Comments</h2>
       <div v-if="props.post.comments.length > 0" class="flex flex-col">
-        <div class="flex justify-between items-center">
+        <div v-for="comment in props.post.comments" :key="comment._id" class="flex justify-between items-center">
           <PostOrCommentOwner :owner="props.post.owner" />
-        </div>
-        <div v-for="comment in props.post.comments" :key="comment._id">
           {{ comment.comment }}
         </div>
       </div>

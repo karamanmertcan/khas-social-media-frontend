@@ -24,6 +24,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "login" */ '../views/LoginView.vue'),
   },
   {
+    path: '/user-info-edit',
+    name: 'user-info-edit',
+    component: () => import(/* webpackChunkName: "user-info-edit" */ '../views/UserInfoEditView.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/register',
     name: 'register',
     component: () => import(/* webpackChunkName: "register" */ '../views/RegisterView.vue'),
@@ -32,6 +40,14 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () => import(/* webpackChunkName: "profile" */ '../views/ProfileView.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/messages',
+    name: 'messages',
+    component: () => import(/* webpackChunkName: "profile" */ '../views/MessagesView.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -45,10 +61,12 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (localStorage.getItem('user') == null) {
+    if (!localStorage.getItem('user')) {
       next({
         path: '/login',
-        params: { nextUrl: to.fullPath },
+        params: {
+          nextUrl: to.fullPath,
+        },
       });
     } else {
       next();

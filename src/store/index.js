@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import router from '../router';
 
 export default createStore({
   state: {
@@ -26,8 +27,7 @@ export default createStore({
       state.userLoggedIn = !state.userLoggedIn;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      router.push('/login');
     },
   },
-  actions: {},
-  modules: {},
 });

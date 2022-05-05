@@ -8,9 +8,10 @@ const { user } = store.state;
 
 <template>
   <div class="flex flex-col justify-center items-center p-5">
-    <img src="https://picsum.photos/200/200" class="rounded-full border-8 object-fill h-32 w-32" alt="profile_image" />
-    <span class="text-white text-xl mt-5 text-center"> @{{ user.username }} </span>
-    <span class="text-white text-xl mt-5 text-center"> {{ user.firstName }} {{ user.lastName }} </span>
+    <div class="relative">
+      <img :src="user.photoURL" class="rounded-full border-8 object-fill h-32 w-32" alt="profile_image" />
+    </div>
+    <span class="text-white text-xl mt-5 text-center"> {{ user.displayName }} </span>
     <span class="text-white text-xl mt-5 text-center"> React Native Developer </span>
   </div>
   <div class="flex flex-row justify-center">

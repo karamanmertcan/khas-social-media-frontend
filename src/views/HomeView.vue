@@ -8,6 +8,8 @@ import CreateModal from '../components/CreateModal.vue';
 
 const posts = ref([]);
 
+const postsLength = ref(0);
+
 const isOpen = ref(false);
 
 const closeModal = () => {
@@ -20,14 +22,42 @@ const openModal = () => {
 const getAllPostsMutation = useMutation(Queries.getFollowingUsersPosts, {
   onSuccess: (res) => {
     posts.value = res;
+    postsLength.value = res.length;
   },
 });
 
 const deletePostMutation = useMutation(Queries.deletePost, {
   onSuccess: (res) => {
-    console.log(res);
     // eslint-disable-next-line no-underscore-dangle
     posts.value = posts.value.filter((post) => post._id !== res._id);
+  },
+});
+
+const handleLikeMutation = useMutation(Queries.handleLike, {
+  onSuccess: (res) => {
+    console.log(res);
+    // eslint-disable-next-line no-underscore-dangle
+    posts.value = posts.value.map((post) => {
+      if (post._id === res._id) {
+        // eslint-disable-next-line no-param-reassign
+        post.likes = res.likes;
+      }
+      return post;
+    });
+  },
+});
+
+const handleUnlikeMutation = useMutation(Queries.handleUnlike, {
+  onSuccess: (res) => {
+    console.log(res);
+    // eslint-disable-next-line no-underscore-dangle
+    posts.value = posts.value.map((post) => {
+      if (post._id === res._id) {
+        // eslint-disable-next-line no-param-reassign
+        post.likes = res.likes;
+      }
+      return post;
+    });
   },
 });
 
@@ -58,8 +88,13 @@ onBeforeMount(() => {
       <router-link to="/profile" class="w-full mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white h-10 rounded-2xl flex items-center justify-center">My Profile</router-link>
     </div>
     <div class="lg:w-3/6 w-full">
-      <div v-for="post in posts" :key="post._id">
-        <PostCard :post="post" :deletePost="deletePostMutation" />
+      <div v-if="!posts || !posts.length">
+        <h2>There is no posts</h2>
+      </div>
+      <div v-else>
+        <div v-for="post in posts" :key="post._id">
+          <PostCard :post="post" :deletePost="deletePostMutation" :handleLike="handleLikeMutation" :handleUnlike="handleUnlikeMutation" />
+        </div>
       </div>
     </div>
     <div class="lg:w-1/6 hidden lg:block h-screen sticky top-0">

@@ -13,6 +13,7 @@
     "@headlessui/vue": "^1.5.0",
     "axios": "^0.26.1",
     "core-js": "^3.8.3",
+    "firebase": "^9.6.11",
     "flowbite": "^1.4.1",
     "vue": "^3.2.13",
     "vue-ionicons": "^3.0.5",

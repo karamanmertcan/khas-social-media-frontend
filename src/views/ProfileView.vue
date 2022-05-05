@@ -10,7 +10,6 @@ import UserInformations from '../components/UserInformations.vue';
 
 <style scoped>
 .profile__header {
-  background-color: #8ec5fc;
-  background-image: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%);
+  background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
 }
 </style>
